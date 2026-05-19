@@ -20,7 +20,7 @@
   .pluck-btn:active { transform: scale(0.98); }
   .section-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
   .keyboard-wrap { overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
-  .keyboard { position: relative; height: 80px; display: inline-flex; gap: 0; user-select: none; }
+  .keyboard { position: relative; height: 80px; display: inline-flex; gap: 0; user-select: none; touch-action: none; }
   .wkey { width: 32px; height: 80px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; font-size: 9px; color: var(--color-text-tertiary); position: relative; z-index: 1; transition: background 0.08s; flex-shrink: 0; }
   .wkey:hover { background: var(--color-background-info); }
   .wkey.active { background: #FAC775; color: #412402; }
@@ -147,15 +147,35 @@ lengthSlider.addEventListener('input', updateLabels);
 
 // ── Karplus-Strong audio ──────────────────────────────────────
 let audioCtx = null;
-function getAudioCtx(){
+let audioUnlocked = false;
+
+async function getAudioCtx(){
   if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  if(audioCtx.state==='suspended') audioCtx.resume();
+  if(audioCtx.state==='suspended') await audioCtx.resume();
+  // iOS unlock: play a silent buffer once on first real gesture
+  if(!audioUnlocked){
+    audioUnlocked = true;
+    const silentBuf = audioCtx.createBuffer(1,1,audioCtx.sampleRate);
+    const silentSrc = audioCtx.createBufferSource();
+    silentSrc.buffer = silentBuf;
+    silentSrc.connect(audioCtx.destination);
+    silentSrc.start(0);
+  }
   return audioCtx;
 }
 
-function pluck(freq, duration=2.0){
+// Pre-warm AudioContext on first touch anywhere (required for iOS Safari)
+function earlyUnlock(){
+  if(audioCtx) return;
+  audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  if(audioCtx.state==='suspended') audioCtx.resume().catch(()=>{});
+}
+document.addEventListener('touchstart', earlyUnlock, {once:true, passive:true});
+document.addEventListener('click', earlyUnlock, {once:true});
+
+async function pluck(freq, duration=2.0){
   if(freq<=0||freq>20000) return;
-  const ctx = getAudioCtx();
+  const ctx = await getAudioCtx();
   const sr = ctx.sampleRate;
   const N  = Math.round(sr/freq);
   if(N<2) return;
@@ -193,10 +213,21 @@ function pluck(freq, duration=2.0){
   triggerAnimation(freq);
 }
 
-document.getElementById('pluckBtn').addEventListener('click', ()=>{
+function addTouchPluck(el, getFreq, extraAction){
+  el.addEventListener('touchend', e=>{
+    e.preventDefault(); // prevent 300ms click delay
+    const f = getFreq();
+    if(extraAction) extraAction(f);
+    pluck(f);
+  }, {passive:false});
+}
+
+const pluckBtn = document.getElementById('pluckBtn');
+pluckBtn.addEventListener('click', ()=>{
   const f = computeFreq(tension,mass,length);
   pluck(f);
 });
+addTouchPluck(pluckBtn, ()=>computeFreq(tension,mass,length));
 
 // ── String animation ──────────────────────────────────────────
 const canvas = document.getElementById('stringCanvas');
@@ -315,14 +346,16 @@ OCTAVES.forEach(oct=>{
     div.className='wkey';
     div.textContent = noteName;
     div.dataset.freq = f;
-    div.addEventListener('click',()=>{
+    function activateKey(el, freq){
       if(activeKey) activeKey.classList.remove('active');
-      div.classList.add('active');
-      activeKey = div;
-      tuneToFreq(f);
-      pluck(f);
-      setTimeout(()=>div.classList.remove('active'),300);
-    });
+      el.classList.add('active');
+      activeKey = el;
+      tuneToFreq(freq);
+      pluck(freq);
+      setTimeout(()=>el.classList.remove('active'),300);
+    }
+    div.addEventListener('click',()=>activateKey(div, f));
+    div.addEventListener('touchend', e=>{ e.preventDefault(); activateKey(div, f); }, {passive:false});
     kbContainer.appendChild(div);
     wkeys.push({el:div, x: wi});
   });
@@ -337,15 +370,16 @@ OCTAVES.forEach(oct=>{
     bk.className='bkey';
     bk.textContent = noteName;
     bk.dataset.freq = f;
-    bk.addEventListener('click',e=>{
-      e.stopPropagation();
+    function activateBkey(freq){
       if(activeKey) activeKey.classList.remove('active');
       bk.classList.add('active');
       activeKey = bk;
-      tuneToFreq(f);
-      pluck(f);
+      tuneToFreq(freq);
+      pluck(freq);
       setTimeout(()=>bk.classList.remove('active'),300);
-    });
+    }
+    bk.addEventListener('click',e=>{ e.stopPropagation(); activateBkey(f); });
+    bk.addEventListener('touchend', e=>{ e.preventDefault(); e.stopPropagation(); activateBkey(f); }, {passive:false});
     kbContainer.appendChild(bk);
     // Position relative to keyboard container after render
     bk._refEl = ref;
@@ -433,7 +467,9 @@ function playSeq(){
 }
 
 seqPlay.addEventListener('click', playSeq);
+seqPlay.addEventListener('touchend', e=>{ e.preventDefault(); playSeq(); }, {passive:false});
 seqStop.addEventListener('click', stopSeq);
+seqStop.addEventListener('touchend', e=>{ e.preventDefault(); stopSeq(); }, {passive:false});
 
 // Init display
 updateLabels();
