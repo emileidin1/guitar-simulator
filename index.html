@@ -93,6 +93,11 @@
   .seq-btn { font-family: var(--font-mono, monospace); font-size: 13px; padding: 6px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); }
   .seq-btn:hover { background: var(--color-background-secondary); }
   .seq-btn.playing { border-color: #1D9E75; color: #1D9E75; }
+  @media(max-width: 560px) {
+    .seq-row { gap: 10px; }
+    .seq-select { font-size: 16px; padding: 12px 10px; width: 100%; }
+    .seq-btn { font-size: 17px; padding: 14px 22px; flex: 1; }
+  }
   .pitch-info { font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px; }
 </style>
 
