@@ -51,6 +51,9 @@
   .pluck-btn { display: block; width: 100%; padding: 10px; font-family: var(--font-mono, monospace); font-size: 14px; font-weight: 500; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-primary); transition: background 0.1s; margin-bottom: 14px; }
   .pluck-btn:hover { background: var(--color-background-secondary); }
   .pluck-btn:active { transform: scale(0.98); }
+  @media(max-width: 560px) {
+    .pluck-btn { padding: 18px; font-size: 18px; }
+  }
   .section-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
   .keyboard-wrap { overflow-x: auto; padding: 10px 10px 10px 10px; margin-bottom: 14px; background: #1a0e04; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.55); }
   .keyboard { position: relative; height: 148px; display: inline-flex; gap: 0; user-select: none; touch-action: none; }
