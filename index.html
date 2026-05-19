@@ -19,14 +19,39 @@
   .pluck-btn:hover { background: var(--color-background-secondary); }
   .pluck-btn:active { transform: scale(0.98); }
   .section-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .keyboard-wrap { overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; }
-  .keyboard { position: relative; height: 80px; display: inline-flex; gap: 0; user-select: none; touch-action: none; }
-  .wkey { width: 32px; height: 80px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 0 0 4px 4px; cursor: pointer; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; font-size: 9px; color: var(--color-text-tertiary); position: relative; z-index: 1; transition: background 0.08s; flex-shrink: 0; }
-  .wkey:hover { background: var(--color-background-info); }
-  .wkey.active { background: #FAC775; color: #412402; }
-  .bkey { width: 20px; height: 50px; background: var(--color-text-primary); border-radius: 0 0 3px 3px; cursor: pointer; position: absolute; top: 0; z-index: 2; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; font-size: 8px; color: var(--color-background-primary); transition: background 0.08s; }
-  .bkey:hover { background: #3C3489; }
-  .bkey.active { background: #7F77DD; }
+  .keyboard-wrap { overflow-x: auto; padding: 10px 10px 10px 10px; margin-bottom: 14px; background: #1a0e04; border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.55); }
+  .keyboard { position: relative; height: 148px; display: inline-flex; gap: 0; user-select: none; touch-action: none; }
+  .wkey {
+    width: 38px; height: 148px;
+    background: linear-gradient(175deg, #f5f5f5 0%, #ffffff 8%, #ffffff 75%, #ddd 100%);
+    border: 1px solid #bbb;
+    border-top: 1.5px solid #e0e0e0;
+    border-radius: 0 0 6px 6px;
+    cursor: pointer;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 7px;
+    font-size: 9px; color: #aaa;
+    position: relative; z-index: 1;
+    transition: background 0.06s, box-shadow 0.06s;
+    flex-shrink: 0;
+    box-shadow: -1px 0 0 rgba(255,255,255,0.9) inset, 0 -5px 6px rgba(0,0,0,0.12) inset, 2px 3px 6px rgba(0,0,0,0.35);
+  }
+  .wkey:active { background: linear-gradient(175deg, #e8e8e8 0%, #f5f5f5 8%, #f5f5f5 75%, #ccc 100%); box-shadow: -1px 0 0 rgba(255,255,255,0.7) inset, 0 -2px 3px rgba(0,0,0,0.1) inset, 1px 1px 3px rgba(0,0,0,0.3); }
+  .wkey.active { background: linear-gradient(175deg, #f8d980 0%, #FAC775 8%, #FAC775 75%, #c8962a 100%); color: #5a3000; box-shadow: -1px 0 0 rgba(255,255,200,0.5) inset, 0 -2px 3px rgba(0,0,0,0.1) inset, 1px 1px 3px rgba(0,0,0,0.3); }
+  .bkey {
+    width: 24px; height: 94px;
+    background: linear-gradient(to bottom, #4a4a4a 0%, #1a1a1a 25%, #080808 70%, #000 100%);
+    border-radius: 0 0 5px 5px;
+    cursor: pointer;
+    position: absolute; top: 0; z-index: 2;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 5px;
+    font-size: 7px; color: rgba(255,255,255,0.3);
+    transition: background 0.06s, box-shadow 0.06s;
+    box-shadow: 0 5px 8px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15), inset -1px 0 0 rgba(255,255,255,0.05), inset 1px 0 0 rgba(0,0,0,0.5);
+  }
+  .bkey:active { background: linear-gradient(to bottom, #333 0%, #111 25%, #040404 70%, #000 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.1); }
+  .bkey.active { background: linear-gradient(to bottom, #8878ee 0%, #6658cc 30%, #4438aa 100%); box-shadow: 0 3px 5px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.25); color: rgba(255,255,255,0.6); }
   .seq-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .seq-select { font-family: var(--font-mono, monospace); font-size: 13px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 6px 8px; color: var(--color-text-primary); cursor: pointer; }
   .seq-btn { font-family: var(--font-mono, monospace); font-size: 13px; padding: 6px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); }
@@ -394,7 +419,7 @@ requestAnimationFrame(()=>{
     const ref = bk._refEl;
     if(!ref) return;
     const rx = ref.offsetLeft;
-    bk.style.left = (rx + 22)+'px';
+    bk.style.left = (rx + 26)+'px';
   });
 });
 
